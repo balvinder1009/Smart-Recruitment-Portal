@@ -26,7 +26,7 @@ def create_app(config_name=None):
     
     CORS(app, resources={
         r"/api/*": {
-            "origins": ["http://localhost:3000"],
+            "origins": ["http://localhost:3000", "https://smart-recruitment-portal-1.onrender.com"],
             "methods": ["GET", "POST", "PUT", "DELETE", "PATCH"],
             "allow_headers": ["Content-Type", "Authorization"]
         }
