@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:5000/api',
+  baseURL: process.env.REACT_APP_API_URL || 'https://smart-recruitment-portal.onrender.com/api',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -20,46 +20,35 @@ api.interceptors.request.use(
   }
 );
 
-// Auth API calls
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token');
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
+
 export const authAPI = {
-  login: (email, password) => 
-    api.post('/auth/login', { email, password }),
-  
-  register: (userData) => 
-    api.post('/auth/register', userData),
-  
-  getCurrentUser: () => 
-    api.get('/auth/me'),
-  
-  updateProfile: (userData) => 
-    api.put('/auth/profile', userData),
+  login: (email, password) => api.post('/auth/login', { email, password }),
+  register: (userData) => api.post('/auth/register', userData),
+  getCurrentUser: () => api.get('/auth/me'),
+  updateProfile: (userData) => api.put('/auth/profile', userData),
 };
 
-// Job API calls
 export const jobAPI = {
-  getJobs: (params) => 
-    api.get('/jobs', { params }),
-  
-  getJob: (id) => 
-    api.get(`/jobs/${id}`),
-  
-  createJob: (jobData) =>
-    api.post('/jobs', jobData),
-  
-  updateJob: (id, jobData) =>
-    api.put(`/jobs/${id}`, jobData),
-  
-  deleteJob: (id) =>
-    api.delete(`/jobs/${id}`),
+  getJobs: (params) => api.get('/jobs', { params }),
+  getJob: (id) => api.get(`/jobs/${id}`),
+  createJob: (jobData) => api.post('/jobs', jobData),
+  updateJob: (id, jobData) => api.put(`/jobs/${id}`, jobData),
+  deleteJob: (id) => api.delete(`/jobs/${id}`),
 };
 
-// AI API calls
 export const aiAPI = {
-  getMatchedJobs: () =>
-    api.get('/ai/match-jobs'),
-  
-  getSkillGaps: () =>
-    api.get('/ai/skill-gap'),
+  getMatchedJobs: () => api.get('/ai/match-jobs'),
+  getSkillGaps: () => api.get('/ai/skill-gap'),
 };
 
 export default api;
